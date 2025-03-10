@@ -25,7 +25,11 @@ app.use(
 );
 app.use(express.json());
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000", // Replace with your frontend's origin
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+}));
 app.use(xss());
 
 //Routes

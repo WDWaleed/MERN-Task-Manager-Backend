@@ -9,14 +9,18 @@ const createTask = async (req, res) => {
   }
   req.body.createdBy = req.user.userId;
 
+  // console.log(req.body);
+
   const task = await Task.create(req.body);
-  res.status(StatusCodes.CREATED).json(task);
+  console.log(task);
+
+  res.status(StatusCodes.CREATED).json({ task });
 };
 const getTasks = async (req, res) => {
   const { userId } = req.user;
   const { status } = req.query;
   let tasks;
-  if (status) {
+  if (status != undefined) {
     tasks = await Task.find({ createdBy: userId, status }).sort("-createdAt");
   } else {
     tasks = await Task.find({ createdBy: userId }).sort("-createdAt");
@@ -26,15 +30,17 @@ const getTasks = async (req, res) => {
 };
 const updateTask = async (req, res) => {
   const { id } = req.params;
-  const { userId } = req.user;
-  const { body } = req;
-  if (body.name === "" || body.status === "") {
+  const userId = req.body.createdBy;
+  console.log(userId);
+  const { name, completed } = req.body;
+  console.log(req.body);
+  if (name === "" || completed === undefined) {
     throw new BadRequestError("Please provide a name");
   }
 
   const task = await Task.findByIdAndUpdate(
     { _id: id, createdBy: userId },
-    body,
+    { name, completed },
     { new: true }
   );
   res.status(StatusCodes.OK).json(task);
@@ -47,12 +53,12 @@ const deleteTask = async (req, res) => {
   if (task.deletedCount == 0) {
     throw new NotFoundError(`No task with id ${req.params.id} was found`);
   }
+
   res.status(StatusCodes.OK).send("Task deleted");
 };
 const deleteTasks = async (req, res) => {
-  const { clear } = req.query;
-  const tasks = await Task.deleteMany({ status: clear });
-  res.status(StatusCodes.OK).send(`${clear} tasks deleted`);
+  const tasks = await Task.deleteMany({ completed: true });
+  res.status(StatusCodes.OK).send(tasks);
 };
 
 module.exports = {
