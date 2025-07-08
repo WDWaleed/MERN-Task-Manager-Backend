@@ -6,8 +6,18 @@ const register = async (req, res) => {
   const user = await User.create(req.body);
 
   const token = user.createJWT();
-  return res.status(StatusCodes.OK).json({ user: { name: user.name }, token });
+  // return res.status(StatusCodes.OK).json({ user: { name: user.name }, token });Using cookies now
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+
+  return res.status(StatusCodes.OK).json({ user: { name: user.name } });
 };
+
 const login = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -25,7 +35,25 @@ const login = async (req, res) => {
   }
 
   const token = user.createJWT();
-  res.status(StatusCodes.OK).json({ user: { name: user.name }, token });
+  // res.status(StatusCodes.OK).json({ user: { name: user.name }, token });
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+
+  return res.status(StatusCodes.OK).json({ user: { name: user.name } });
 };
 
-module.exports = { register, login };
+const logout = async (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+  });
+
+  return res.sendStatus(StatusCodes.NO_CONTENT);
+};
+
+module.exports = { register, login, logout };

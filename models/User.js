@@ -24,6 +24,26 @@ const UserSchema = new mongoose.Schema({
     minlength: 3,
     maxlength: 50,
   },
+  verificationOtp: {
+    type: String,
+    default: "",
+  },
+  verificationOtpExpires: {
+    type: Number, // Course used Number but I think Date with default null would be better
+    default: 0,
+  },
+  isAccountVerified: {
+    type: Boolean,
+    default: false,
+  },
+  resetOtp: {
+    type: String,
+    default: "",
+  },
+  resetOtpExpires: {
+    type: Number, // Course used Number but I think Date with default null would be better
+    default: 0,
+  },
 });
 
 UserSchema.pre("save", async function () {

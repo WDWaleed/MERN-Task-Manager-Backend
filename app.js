@@ -7,10 +7,13 @@ const helmet = require("helmet");
 const cors = require("cors");
 const xss = require("xss-clean");
 const rateLimiter = require("express-rate-limit");
+const cookieParser = require("cookie-parser");
 
 const errorHandlerMiddleware = require("./middleware/errorHandlerMiddleware");
 const notFoundMiddleware = require("./middleware/notFoundMiddleware");
 const authenticationMiddleware = require("./middleware/authenticationMiddleware");
+
+// API Endpoints
 const TasksRouter = require("./routes/tasks");
 const AuthRouter = require("./routes/auth");
 const app = express();
@@ -25,11 +28,14 @@ app.use(
 );
 app.use(express.json());
 app.use(helmet());
-app.use(cors({
-  origin: "http://localhost:3000", // Replace with your frontend's origin
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
-}));
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:3001", // Replace with your frontend's origin
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
 app.use(xss());
 
 //Routes

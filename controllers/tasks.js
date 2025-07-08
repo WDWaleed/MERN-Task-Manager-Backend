@@ -7,14 +7,16 @@ const createTask = async (req, res) => {
   if (!name) {
     throw new BadRequestError("Please provide a name");
   }
-  req.body.createdBy = req.user.userId;
+
+  const { userId } = req.user;
+  req.body.createdBy = userId;
 
   // console.log(req.body);
 
   const task = await Task.create(req.body);
-  console.log(task);
+  const tasks = await Task.find({ createdBy: userId }).sort("-createdAt");
 
-  res.status(StatusCodes.CREATED).json({ task });
+  res.status(StatusCodes.CREATED).json(tasks);
 };
 const getTasks = async (req, res) => {
   const { userId } = req.user;
