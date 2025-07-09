@@ -13,9 +13,9 @@ const errorHandlerMiddleware = require("./middleware/errorHandlerMiddleware");
 const notFoundMiddleware = require("./middleware/notFoundMiddleware");
 const authenticationMiddleware = require("./middleware/authenticationMiddleware");
 
-// API Endpoints
 const TasksRouter = require("./routes/tasks");
 const AuthRouter = require("./routes/auth");
+const UserRouter = require("./routes/user");
 const app = express();
 
 // Middleware
@@ -43,6 +43,8 @@ app.get("/", (req, res) => {
   res.send("MERN Task Manager");
 });
 app.use("/api/v1/auth", AuthRouter);
+app.use("/api/v1/user", UserRouter);
+
 app.use("/api/v1/tasks", authenticationMiddleware, TasksRouter);
 
 app.use(notFoundMiddleware);
