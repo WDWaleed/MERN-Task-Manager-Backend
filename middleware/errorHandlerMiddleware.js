@@ -24,7 +24,6 @@ const errorHandler = async (err, req, res, next) => {
 
   // console.log(error);
   return res.status(error.statusCode).json({ msg: error.message });
-  return res.json({ err });
 };
 
 module.exports = errorHandler;

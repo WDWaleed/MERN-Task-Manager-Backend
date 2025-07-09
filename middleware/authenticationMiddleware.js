@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 
 const authenticate = async (req, res, next) => {
   const { token } = req.cookies;
+
   if (!token) {
     throw new UnauthorizedError("Authentication Failed");
   }
