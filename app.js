@@ -22,8 +22,9 @@ const app = express();
 app.set("trust proxy", 1);
 app.use(
   rateLimiter({
-    windowMs: 15 * 1000 * 60, // 15 minutes
+    windowMs: 1 * 1000 * 60, // 15 minutes
     max: 100, // Limit each IP to 100 requests per windowMs
+    message: "Too many requests, please try again later",
   })
 );
 app.use(express.json());
@@ -31,7 +32,7 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:3001", // Replace with your frontend's origin
+    origin: "http://localhost:3001",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })
@@ -58,7 +59,7 @@ const startServer = async () => {
       console.log(`Server is listening on port ${PORT}`);
     });
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
   }
 };
 

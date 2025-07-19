@@ -22,6 +22,6 @@ router.post("/reset-password", resetPassword);
 // Protected routes
 router.post("/send-verification-otp", authenticate, sendVerificationOtp);
 router.post("/verify-email", authenticate, verifyEmail);
-router.post("/is-authenticated", authenticate, isAuthenticated);
+router.get("/is-authenticated", authenticate, isAuthenticated);
 
 module.exports = router;

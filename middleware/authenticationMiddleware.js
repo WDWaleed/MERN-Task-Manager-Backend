@@ -11,7 +11,6 @@ const authenticate = async (req, res, next) => {
 
   try {
     const { userId } = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(userId);
     if (userId) {
       req.userId = userId;
     } else {

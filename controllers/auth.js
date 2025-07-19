@@ -1,7 +1,11 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const { StatusCodes } = require("http-status-codes");
-const { BadRequestError, UnauthorizedError } = require("../errors");
+const {
+  BadRequestError,
+  UnauthorizedError,
+  NotFoundError,
+} = require("../errors");
 const transporter = require("../config/nodemailer");
 
 const register = async (req, res) => {
@@ -18,105 +22,113 @@ const register = async (req, res) => {
   });
 
   // Sending welcome email
-  const { name, email } = req.body;
-  const mailOptions = {
-    from: process.env.SENDER_EMAIL,
-    to: email,
-    subject: "Welcome to my MERN Task Manager",
-    html: `<!DOCTYPE html>
-              <html lang="en">
-              <head>
-                <meta charset="UTF-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>Email Template</title>
-                <style>
-                  body {
-                    margin: 0;
-                    padding: 0;
-                    background-color: #f4f4f7;
-                    font-family: Arial, sans-serif;
-                    color: #333333;
-                  }
-                  .container {
-                    width: 100%;
-                    max-width: 600px;
-                    margin: 0 auto;
-                    background-color: #ffffff;
-                    border-radius: 8px;
-                    overflow: hidden;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                  }
-                  .header {
-                    background-color: #4f46e5;
-                    color: #ffffff;
-                    text-align: center;
-                    padding: 20px;
-                  }
-                  .content {
-                    padding: 30px;
-                  }
-                  .content h1 {
-                    font-size: 24px;
-                    margin-top: 0;
-                    color: #111827;
-                  }
-                  .content p {
-                    font-size: 16px;
-                    line-height: 1.5;
-                  }
-                  .button {
-                    display: inline-block;
-                    margin-top: 20px;
-                    padding: 12px 20px;
-                    background-color: #4f46e5;
-                    color: #ffffff;
-                    text-decoration: none;
-                    border-radius: 4px;
-                    font-weight: bold;
-                  }
-                  .footer {
-                    text-align: center;
-                    font-size: 12px;
-                    color: #999999;
-                    padding: 20px;
-                  }
-                  @media screen and (max-width: 600px) {
-                    .content {
+    const { name, email } = req.body;
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
+      to: email,
+      subject: "Welcome to my MERN Task Manager",
+      html: `<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                  <meta charset="UTF-8" />
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                  <title>Email Template</title>
+                  <style>
+                    body {
+                      margin: 0;
+                      padding: 0;
+                      background-color: #f4f4f7;
+                      font-family: Arial, sans-serif;
+                      color: #333333;
+                    }
+                    .container {
+                      width: 100%;
+                      max-width: 600px;
+                      margin: 0 auto;
+                      background-color: #ffffff;
+                      border-radius: 8px;
+                      overflow: hidden;
+                      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                    }
+                    .header {
+                      background-color: #4f46e5;
+                      color: #ffffff;
+                      text-align: center;
                       padding: 20px;
                     }
-                  }
-                </style>
-              </head>
-              <body>
-                <div class="container">
-                  <div class="header">
-                    <h2>MERN Task Manager</h2>
+                    .content {
+                      padding: 30px;
+                    }
+                    .content h1 {
+                      font-size: 24px;
+                      margin-top: 0;
+                      color: #111827;
+                    }
+                    .content p {
+                      font-size: 16px;
+                      line-height: 1.5;
+                    }
+                    .button {
+                      display: inline-block;
+                      margin-top: 20px;
+                      padding: 12px 20px;
+                      background-color: #4f46e5;
+                      color: #ffffff;
+                      text-decoration: none;
+                      border-radius: 4px;
+                      font-weight: bold;
+                    }
+                    .footer {
+                      text-align: center;
+                      font-size: 12px;
+                      color: #999999;
+                      padding: 20px;
+                    }
+                    @media screen and (max-width: 600px) {
+                      .content {
+                        padding: 20px;
+                      }
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="container">
+                    <div class="header">
+                      <h2>MERN Task Manager</h2>
+                    </div>
+                    <div class="content">
+                      <h1>Hello, ${name}!</h1>
+                      <p>
+                        We wanted to let you know that your account has been successfully created.
+                      </p>
+                      <p>
+                        If this was you, please confirm your action below:
+                      </p>
+                      <a href="[YOUR_LINK_HERE]" class="button">Take Action</a>
+                      <p style="margin-top: 30px;">
+                        If you didn’t request this, you can safely ignore this email.
+                      </p>
+                    </div>
+                    <div class="footer">
+                      &copy; 2025 MERN Task Manager. All rights reserved.<br>
+                    </div>
                   </div>
-                  <div class="content">
-                    <h1>Hello, ${name}!</h1>
-                    <p>
-                      We wanted to let you know that your account has been successfully created.
-                    </p>
-                    <p>
-                      If this was you, please confirm your action below:
-                    </p>
-                    <a href="[YOUR_LINK_HERE]" class="button">Take Action</a>
-                    <p style="margin-top: 30px;">
-                      If you didn’t request this, you can safely ignore this email.
-                    </p>
-                  </div>
-                  <div class="footer">
-                    &copy; 2025 MERN Task Manager. All rights reserved.<br>
-                  </div>
-                </div>
-              </body>
-              </html>
-`,
-  };
+                </body>
+                </html>
+  `,
+    };
 
   await transporter.sendMail(mailOptions);
 
-  return res.status(StatusCodes.OK).json({ user: { name: user.name } });
+  const otp = Math.floor(100000 + Math.random() * 900000);
+  user.verificationOtp = otp;
+  user.verificationOtpExpires = Date.now() + 24 * 60 * 60 * 1000;
+
+  await user.save();
+
+  return res
+    .status(StatusCodes.OK)
+    .json({ user: { name: user.name }, msg: "Registration Successful!" });
 };
 
 const login = async (req, res) => {
@@ -135,7 +147,6 @@ const login = async (req, res) => {
   }
 
   const isCorrectPassword = await user.comparePasswords(password);
-  console.log(isCorrectPassword);
   if (!isCorrectPassword) {
     throw new UnauthorizedError("Invalid Credentials");
   }
@@ -150,7 +161,9 @@ const login = async (req, res) => {
 
   await User.findByIdAndUpdate(user._id, { lastLogin: Date.now() });
 
-  return res.status(StatusCodes.OK).json({ user: { name: user.name } });
+  return res
+    .status(StatusCodes.OK)
+    .json({ user: { name: user.name }, msg: "Logged In!" });
 };
 
 const logout = async (req, res) => {
@@ -166,7 +179,7 @@ const logout = async (req, res) => {
 const sendVerificationOtp = async (req, res) => {
   const user = await User.findById(req.userId);
   if (user.isAccountVerified) {
-    return res.send("Account already verified");
+    return res.status(StatusCodes.OK).send("Account already verified");
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000);
@@ -312,16 +325,37 @@ const verifyEmail = async (req, res) => {
   }
 
   user.isAccountVerified = true;
-  (user.verificationOtp = ""), (user.verificationOtpExpires = 0);
+  user.verificationOtp = "";
+  user.verificationOtpExpires = 0;
 
   await user.save();
-  return res
-    .status(StatusCodes.OK)
-    .json({ success: true, message: "Email verified successfully" });
+  return res.status(StatusCodes.OK).json({
+    user: {
+      name: user.name,
+      isAccountVerified: user.isAccountVerified,
+    },
+    msg: "Email verified successfully",
+  });
 };
 
 const isAuthenticated = async (req, res) => {
-  return res.json({ success: true });
+  const { userId } = req;
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
+
+  if (!user.isAccountVerified) {
+    throw new UnauthorizedError("Your account is unverified");
+  }
+
+  return res.status(StatusCodes.OK).json({
+    user: {
+      name: user.name,
+      isAccountVerified: user.isAccountVerified,
+    },
+  });
 };
 
 const sendResetOtp = async (req, res) => {
@@ -456,8 +490,6 @@ const sendResetOtp = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-  console.log(req.body);
-
   const { email, otp, newPass } = req.body;
   if (!email || !otp || !newPass) {
     throw new BadRequestError("Please provide all the required values");

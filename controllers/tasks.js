@@ -2,24 +2,8 @@ const Task = require("../models/Task");
 const { BadRequestError, NotFoundError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
 
-const createTask = async (req, res) => {
-  const { name } = req.body;
-  if (!name) {
-    throw new BadRequestError("Please provide a name");
-  }
-
-  const { userId } = req.user;
-  req.body.createdBy = userId;
-
-  // console.log(req.body);
-
-  const task = await Task.create(req.body);
-  const tasks = await Task.find({ createdBy: userId }).sort("-createdAt");
-
-  res.status(StatusCodes.CREATED).json(tasks);
-};
 const getTasks = async (req, res) => {
-  const { userId } = req.user;
+  const { userId } = req;
   const { status } = req.query;
   let tasks;
   if (status != undefined) {
@@ -30,26 +14,40 @@ const getTasks = async (req, res) => {
 
   res.status(StatusCodes.OK).json({ count: tasks.length, tasks });
 };
-const updateTask = async (req, res) => {
-  const { id } = req.params;
-  const userId = req.body.createdBy;
-  console.log(userId);
-  const { name, completed } = req.body;
-  console.log(req.body);
-  if (name === "" || completed === undefined) {
+
+const createTask = async (req, res) => {
+  const { name } = req.body;
+  if (!name) {
     throw new BadRequestError("Please provide a name");
   }
 
-  const task = await Task.findByIdAndUpdate(
-    { _id: id, createdBy: userId },
-    { name, completed },
-    { new: true }
-  );
+  const { userId } = req;
+  req.body.createdBy = userId;
+
+  const task = await Task.create(req.body);
+
+  res.sendStatus(StatusCodes.CREATED);
+};
+
+const toggleTask = async (req, res) => {
+  const { id } = req.params;
+  const { userId } = req;
+
+  const task = await Task.findOne({ _id: id, createdBy: userId });
+  if (!task) {
+    throw new NotFoundError("Task not found");
+  }
+
+  task.completed = !task.completed;
+  await task.save();
+
   res.status(StatusCodes.OK).json(task);
 };
+
 const deleteTask = async (req, res) => {
   const { id } = req.params;
-  const { userId } = req.user;
+  const { userId } = req;
+  console.log(userId);
   const task = await Task.deleteOne({ _id: id, createdBy: userId });
 
   if (task.deletedCount == 0) {
@@ -58,15 +56,16 @@ const deleteTask = async (req, res) => {
 
   res.status(StatusCodes.OK).send("Task deleted");
 };
-const deleteTasks = async (req, res) => {
+
+const deleteCompletedTasks = async (req, res) => {
   const tasks = await Task.deleteMany({ completed: true });
-  res.status(StatusCodes.OK).send(tasks);
+  res.status(StatusCodes.OK).send("Completed tasks cleared");
 };
 
 module.exports = {
   getTasks,
-  updateTask,
+  toggleTask,
   deleteTask,
-  deleteTasks,
+  deleteCompletedTasks,
   createTask,
 };
