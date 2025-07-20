@@ -32,7 +32,10 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:3001",
+    origin:
+      process.env.NODE_ENV == "development"
+        ? "http://localhost:3001"
+        : "https://mern-task-manager-frontend-eight.vercel.app",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
   })

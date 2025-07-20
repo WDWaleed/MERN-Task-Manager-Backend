@@ -12,7 +12,6 @@ const register = async (req, res) => {
   const user = await User.create(req.body);
 
   const token = user.createJWT();
-  // return res.status(StatusCodes.OK).json({ user: { name: user.name }, token });Using cookies now
 
   res.cookie("token", token, {
     httpOnly: true,
@@ -22,12 +21,12 @@ const register = async (req, res) => {
   });
 
   // Sending welcome email
-    const { name, email } = req.body;
-    const mailOptions = {
-      from: process.env.SENDER_EMAIL,
-      to: email,
-      subject: "Welcome to my MERN Task Manager",
-      html: `<!DOCTYPE html>
+  const { name, email } = req.body;
+  const mailOptions = {
+    from: process.env.SENDER_EMAIL,
+    to: email,
+    subject: "Welcome to my MERN Task Manager",
+    html: `<!DOCTYPE html>
                 <html lang="en">
                 <head>
                   <meta charset="UTF-8" />
@@ -116,7 +115,7 @@ const register = async (req, res) => {
                 </body>
                 </html>
   `,
-    };
+  };
 
   await transporter.sendMail(mailOptions);
 
