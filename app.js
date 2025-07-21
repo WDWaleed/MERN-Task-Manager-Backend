@@ -27,6 +27,7 @@ app.use(
     message: "Too many requests, please try again later",
   })
 );
+
 app.use(express.json());
 app.use(helmet());
 app.use(cookieParser());
@@ -34,7 +35,7 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV == "development"
-        ? "http://localhost:3001"
+        ? "http://localhost:5173"
         : "https://mern-task-manager-frontend-eight.vercel.app",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
@@ -46,6 +47,7 @@ app.use(xss());
 app.get("/", (req, res) => {
   res.send("MERN Task Manager");
 });
+
 app.use("/api/v1/auth", AuthRouter);
 app.use("/api/v1/user", UserRouter);
 

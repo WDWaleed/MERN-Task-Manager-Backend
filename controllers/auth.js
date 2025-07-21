@@ -18,6 +18,7 @@ const register = async (req, res) => {
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     maxAge: 30 * 24 * 60 * 60 * 1000,
+    partitioned: process.env.NODE_ENV === "production" ? true : false,
   });
 
   // Sending welcome email
@@ -309,7 +310,7 @@ const verifyEmail = async (req, res) => {
 
   const user = await User.findById(userId);
   if (!user) {
-    throw new UnauthorizedError("Unauthorized");
+    throw new UnauthorizedError("User not found");
   }
 
   if (user.verificationOtpExpires < Date.now()) {
