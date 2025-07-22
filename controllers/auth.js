@@ -157,6 +157,7 @@ const login = async (req, res) => {
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     maxAge: 30 * 24 * 60 * 60 * 1000,
+    partitioned: process.env.NODE_ENV === "production" ? true : false,
   });
 
   await User.findByIdAndUpdate(user._id, { lastLogin: Date.now() });
