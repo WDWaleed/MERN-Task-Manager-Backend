@@ -47,7 +47,6 @@ const toggleTask = async (req, res) => {
 const deleteTask = async (req, res) => {
   const { id } = req.params;
   const { userId } = req;
-  console.log(userId);
   const task = await Task.deleteOne({ _id: id, createdBy: userId });
 
   if (task.deletedCount == 0) {

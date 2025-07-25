@@ -22,7 +22,7 @@ const errorHandler = async (err, req, res, next) => {
 
   // console.log(error.message);
 
-  return res.status(error.statusCode).json({ msg: error.message });
+  return res.status(error.statusCode).json({ message: error.message });
 };
 
 module.exports = errorHandler;

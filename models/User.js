@@ -2,51 +2,54 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "Please provide a name"],
-    minlength: 3,
-    maxlength: 50,
+const UserSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Please provide a name"],
+      minlength: 3,
+      maxlength: 50,
+    },
+    email: {
+      type: String,
+      required: [true, "Please provide an email"],
+      match: [
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+        "Please provide valid email",
+      ],
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Please provide a password"],
+    },
+    lastLogin: {
+      type: Date,
+      default: null,
+    },
+    verificationOtp: {
+      type: String,
+      default: "",
+    },
+    verificationOtpExpires: {
+      type: Date,
+      default: null,
+    },
+    isAccountVerified: {
+      type: Boolean,
+      default: false,
+    },
+    resetOtp: {
+      type: String,
+      default: "",
+    },
+    resetOtpExpires: {
+      type: Date,
+      default: null,
+    },
   },
-  email: {
-    type: String,
-    required: [true, "Please provide an email"],
-    match: [
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-      "Please provide valid email",
-    ],
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: [true, "Please provide a password"],
-  },
-  lastLogin: {
-    type: Date,
-    default: null,
-  },
-  verificationOtp: {
-    type: String,
-    default: "",
-  },
-  verificationOtpExpires: {
-    type: Number, // Course used Number but I think Date with default null would be better
-    default: 0,
-  },
-  isAccountVerified: {
-    type: Boolean,
-    default: false,
-  },
-  resetOtp: {
-    type: String,
-    default: "",
-  },
-  resetOtpExpires: {
-    type: Number, // Course used Number but I think Date with default null would be better
-    default: 0,
-  },
-});
+  { timestamps: true }
+);
 
 UserSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
