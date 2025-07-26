@@ -27,13 +27,13 @@ const register = async (req, res) => {
   user.verificationOtpExpires = Date.now() + 24 * 60 * 60 * 1000;
   await user.save();
 
-  // const html = generateVerificationEmail(user, otp);
+  const html = generateVerificationEmail(user, otp);
 
-  // await sendEmail({
-  //   to: user.email,
-  //   subject: "Account Verification OTP",
-  //   html,
-  // });
+  await sendEmail({
+    to: user.email,
+    subject: "Account Verification OTP",
+    html,
+  });
 
   return res
     .status(StatusCodes.OK)
@@ -180,23 +180,24 @@ const sendResetOtp = async (req, res) => {
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000);
-  user.verificationOtp = otp;
-  user.verificationOtpExpires = Date.now() + 24 * 60 * 60 * 1000;
+  user.resetOtp = otp;
+  user.resetOtpExpires = Date.now() + 24 * 60 * 60 * 1000;
   await user.save();
 
-  // const html = generateVerificationEmail(user, otp);
+  const html = generateVerificationEmail(user, otp);
 
-  // await sendEmail({
-  //   to: user.email,
-  //   subject: "Account Verification OTP",
-  //   html,
-  // });
+  await sendEmail({
+    to: user.email,
+    subject: "Account Verification OTP",
+    html,
+  });
 
   return res.status(StatusCodes.OK).send("Reset OTP sent");
 };
 
 const resetPassword = async (req, res) => {
-  const { email, otp, newPass } = req.body;
+  const { email, otp, password: newPass } = req.body;
+  console.log(req.body);
   if (!email || !otp || !newPass) {
     throw new BadRequestError("Please provide all the required values");
   }
@@ -224,9 +225,7 @@ const resetPassword = async (req, res) => {
 
   user.save();
 
-  return res
-    .status(200)
-    .json({ success: true, message: "Password reset was successful" });
+  return res.status(200).json({ message: "Password reset was successful" });
 };
 
 module.exports = {
